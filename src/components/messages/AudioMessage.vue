@@ -1,41 +1,61 @@
 <template>
-  <div class="audio-message" :class="getClass(message)" :messageId="message.messageId" @mouseleave="hideMenu">
+  <div class="audio-message"
+       :class="getClass(message)"
+       :messageId="message.messageId"
+       @mouseleave="hideMenu">
 
-    <img class="file-message__avatar" v-if="message.avatar" :src="message.avatar" height="32" width="32"
-      :style="{ gridRow: message.subText ? '2' : '1' }">
+    <img class="file-message__avatar"
+         v-if="message.avatar"
+         :src="message.avatar"
+         height="32"
+         width="32"
+         :style="{ gridRow: message.subText ? '2' : '1' }">
 
-    <p class="audio-message__subtext" v-if="message.subText">{{ message.subText }}</p>
+    <p class="audio-message__subtext"
+       v-if="message.subText">{{ message.subText }}</p>
 
-    <div class="audio-message__content" @mouseenter="showMenu">
-      <audio ref="player" :src="message.url"></audio>
-      <button class="audio-message__play" v-show="!isPlaying" @click="togglePlayPause">
+    <div class="audio-message__content"
+         @mouseenter="showMenu">
+      <audio ref="player"
+             :src="message.url"></audio>
+      <button class="audio-message__play"
+              v-show="!isPlaying"
+              @click="togglePlayPause">
         <span class="pi pi-play"></span>
       </button>
-      <button class="audio-message__pause" v-show="isPlaying" @click="togglePlayPause">
+      <button class="audio-message__pause"
+              v-show="isPlaying"
+              @click="togglePlayPause">
         <span class="pi pi-pause"></span>
       </button>
       <div class="audio-message__progress-bar-container">
-        <div class="audio-message__progress-bar" :style="{ width: progressPercent + '%' }"></div>
+        <div class="audio-message__progress-bar"
+             :style="{ width: progressPercent + '%' }"></div>
       </div>
       <p class="audio-message__remaining-time">{{ `${formatCurrentTime} / ${formatDuration}` }}</p>
 
       <div class="audio-message__info-container">
         <span class="audio-message__time">22:02</span>
-        <div class="audio-message__status" :class="getStatus"
-          v-if="getClass(message) === 'audio-message__right' && message.status">
-          <span v-if="message.status !== 'sent'" class="pi pi-check"></span>
+        <div class="audio-message__status"
+             :class="getStatus"
+             v-if="getClass(message) === 'audio-message__right' && message.status">
+          <span v-if="message.status !== 'sent'"
+                class="pi pi-check"></span>
           <span class="pi pi-check"></span>
         </div>
       </div>
 
-      <button v-if="buttonMenuVisible && message.actions" class="audio-message__menu-button"
-        @click="isOpenMenu = !isOpenMenu">
+      <button v-if="buttonMenuVisible && message.actions"
+              class="audio-message__menu-button"
+              @click="isOpenMenu = !isOpenMenu">
         <span class="pi pi-ellipsis-h"></span>
       </button>
 
       <transition>
-        <ContextMenu class="audio-message__context-menu" v-if="isOpenMenu && message.actions" :actions="message.actions"
-          @click="clickAction" />
+        <ContextMenu class="audio-message__context-menu"
+                     v-if="isOpenMenu && message.actions"
+                     :actions="message.actions"
+                     @click="clickAction" />
       </transition>
 
     </div>
@@ -135,301 +155,302 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">
-.audio-message {
+<style scoped
+       lang="scss">
+      .audio-message {
 
-  &__content {
-    position: relative;
-    display: grid;
-    grid-template-columns: min-content 1fr;
-    column-gap: var(--audio-message-gap);
-    padding: var(--audio-message-padding);
-    max-width: var(--audio-message-width);
-    border-radius: var(--audio-message-border-radius);
-  }
+        &__content {
+          position: relative;
+          display: grid;
+          grid-template-columns: min-content 1fr;
+          column-gap: var(--audio-message-gap);
+          padding: var(--audio-message-padding);
+          max-width: var(--audio-message-width);
+          border-radius: var(--audio-message-border-radius);
+        }
 
-  &__play,
-  &__pause {
-    border: none;
-    cursor: pointer;
-    position: relative;
-    grid-row: 1 / 3;
-    width: var(--audio-message-button-width);
-    height: var(--audio-message-button-height);
-    border-radius: var(--audio-message-button-border-radius);
+        &__play,
+        &__pause {
+          border: none;
+          cursor: pointer;
+          position: relative;
+          grid-row: 1 / 3;
+          width: var(--audio-message-button-width);
+          height: var(--audio-message-button-height);
+          border-radius: var(--audio-message-button-border-radius);
 
-    span {
-      display: flex;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: var(--icon-font-size-medium);
-    }
-  }
+          span {
+            display: flex;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: var(--icon-font-size-medium);
+          }
+        }
 
-  &__progress-bar-container {
-    position: relative;
-    width: 100%;
-    height: var(--audio-message-pbc-height);
-    border-radius: var(--audio-message-pbc-border-radius);
-    margin: var(--audio-message-pbc-margin);
-    background-color: var(--audio-message-pbc-background-color);
-  }
+        &__progress-bar-container {
+          position: relative;
+          width: 100%;
+          height: var(--audio-message-pbc-height);
+          border-radius: var(--audio-message-pbc-border-radius);
+          margin: var(--audio-message-pbc-margin);
+          background-color: var(--audio-message-pbc-background-color);
+        }
 
-  &__progress-bar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    transition: width 0.2s ease-in-out;
-    border-radius: var(--audio-message-pb-border-radius);
-    background-color: var(--audio-message-pb-background-color);
-  }
+        &__progress-bar {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          transition: width 0.2s ease-in-out;
+          border-radius: var(--audio-message-pb-border-radius);
+          background-color: var(--audio-message-pb-background-color);
+        }
 
-  &__remaining-time {
-    grid-column: 2;
-    margin-bottom: -10px;
-    font-size: var(--remaining-time);
-  }
+        &__remaining-time {
+          grid-column: 2;
+          margin-bottom: -10px;
+          font-size: var(--remaining-time);
+        }
 
-  &__avatar {
-    align-self: center;
-    object-fit: cover;
-    background-color: var(--avatar-background-color);
-    min-width: var(--avatar-width-small);
-    min-height: var(--avatar-height-small);
-    border-radius: var(--avatar-border-radius);
-  }
+        &__avatar {
+          align-self: center;
+          object-fit: cover;
+          background-color: var(--avatar-background-color);
+          min-width: var(--avatar-width-small);
+          min-height: var(--avatar-height-small);
+          border-radius: var(--avatar-border-radius);
+        }
 
-  &__subtext {
-    font-size: 12px;
-    color: var(--neutral-500);
-    font-weight: 500;
-  }
+        &__subtext {
+          font-size: 12px;
+          color: var(--neutral-500);
+          font-weight: 500;
+        }
 
-  &__info-container {
-    position: absolute;
-    bottom: 4px;
-    right: 8px;
-    display: flex;
-    align-items: center;
-    column-gap: 6px;
-  }
+        &__info-container {
+          position: absolute;
+          bottom: 4px;
+          right: 8px;
+          display: flex;
+          align-items: center;
+          column-gap: 6px;
+        }
 
-  &__status {
-    display: flex;
+        &__status {
+          display: flex;
 
-    span {
-      color: var(--status-message-color-received);
-      font-size: var(--status-message-font-size);
-      font-weight: 400;
-    }
-  }
+          span {
+            color: var(--status-message-color-received);
+            font-size: var(--status-message-font-size);
+            font-weight: 400;
+          }
+        }
 
-  &__status--received {
-    span {
-      color: var(--status-message-color-received);
+        &__status--received {
+          span {
+            color: var(--status-message-color-received);
 
-      &:first-child {
-        margin-right: -8px;
-      }
-    }
-  }
+            &:first-child {
+              margin-right: -8px;
+            }
+          }
+        }
 
-  &__status--read {
-    span {
-      color: var(--status-message-color-read);
+        &__status--read {
+          span {
+            color: var(--status-message-color-read);
 
-      &:first-child {
-        margin-right: -8px;
-      }
-    }
-  }
+            &:first-child {
+              margin-right: -8px;
+            }
+          }
+        }
 
-  &__time {
-    font-size: var(--time-message-font-size);
-  }
+        &__time {
+          font-size: var(--time-message-font-size);
+        }
 
-  &__menu-button {
-    position: absolute;
-    background-color: transparent;
-    border: none;
-    transform: translateY(-50%);
-    cursor: pointer;
-    transition: 0.2s;
+        &__menu-button {
+          position: absolute;
+          background-color: transparent;
+          border: none;
+          transform: translateY(-50%);
+          cursor: pointer;
+          transition: 0.2s;
 
-    span {
-      color: var(--neutral-500);
-      font-size: 20px;
-    }
+          span {
+            color: var(--neutral-500);
+            font-size: 20px;
+          }
 
-    &:hover span {
-      color: var(--neutral-700);
-      transition: 0.2s;
-    }
-  }
+          &:hover span {
+            color: var(--neutral-700);
+            transition: 0.2s;
+          }
+        }
 
-  &__context-menu {
-    position: absolute;
-  }
+        &__context-menu {
+          position: absolute;
+        }
 
-  &__left,
-  &__right {
-    display: grid;
-    column-gap: 12px;
-    margin: var(--audio-message-margin);
-  }
+        &__left,
+        &__right {
+          display: grid;
+          column-gap: 12px;
+          margin: var(--audio-message-margin);
+        }
 
-  &__left {
-    grid-template-columns: min-content 1fr;
+        &__left {
+          grid-template-columns: min-content 1fr;
 
-    .audio-message__avatar {
-      grid-column: 1;
-      grid-row: 2;
-    }
+          .audio-message__avatar {
+            grid-column: 1;
+            grid-row: 2;
+          }
 
-    .audio-message__subtext {
-      grid-column: 2;
-      grid-row: 1;
-      margin: 0 0 2px 10px;
-    }
+          .audio-message__subtext {
+            grid-column: 2;
+            grid-row: 1;
+            margin: 0 0 2px 10px;
+          }
 
-    .audio-message__content {
-      grid-column: 2;
-      background-color: var(--audio-message-background-left);
-    }
+          .audio-message__content {
+            grid-column: 2;
+            background-color: var(--audio-message-background-left);
+          }
 
-    .audio-message__play,
-    .audio-message__pause {
-      background-color: var(--audio-message-button-background-color-left);
+          .audio-message__play,
+          .audio-message__pause {
+            background-color: var(--audio-message-button-background-color-left);
 
-      span {
-        color: var(--audio-message-button-icon-color-left);
-      }
-    }
+            span {
+              color: var(--audio-message-button-icon-color-left);
+            }
+          }
 
-    .audio-message__menu-button {
-      top: 50%;
-      right: -40px;
-    }
+          .audio-message__menu-button {
+            top: 50%;
+            right: -40px;
+          }
 
-    .audio-message__context-menu {
-      top: 80%;
-      left: 100%;
-    }
-  }
+          .audio-message__context-menu {
+            top: 80%;
+            left: 100%;
+          }
+        }
 
-  &__right {
-    grid-template-columns: 1fr min-content;
+        &__right {
+          grid-template-columns: 1fr min-content;
 
-    .audio-message__avatar {
-      grid-column: 2;
-      grid-row: 2;
-    }
+          .audio-message__avatar {
+            grid-column: 2;
+            grid-row: 2;
+          }
 
-    .audio-message__subtext {
-      grid-column: 1;
-      grid-row: 1;
-      margin: 0 10px 2px auto;
-    }
+          .audio-message__subtext {
+            grid-column: 1;
+            grid-row: 1;
+            margin: 0 10px 2px auto;
+          }
 
-    .audio-message__content {
-      grid-column: 1;
-      margin-left: auto;
-      background-color: var(--audio-message-background-right);
-    }
+          .audio-message__content {
+            grid-column: 1;
+            margin-left: auto;
+            background-color: var(--audio-message-background-right);
+          }
 
-    .audio-message__play,
-    .audio-message__pause {
-      background-color: var(--audio-message-button-background-color-right);
+          .audio-message__play,
+          .audio-message__pause {
+            background-color: var(--audio-message-button-background-color-right);
 
-      span {
-        color: var(--audio-message-button-icon-color-right);
-      }
-    }
+            span {
+              color: var(--audio-message-button-icon-color-right);
+            }
+          }
 
-    .audio-message__menu-button {
-      top: 50%;
-      left: -40px;
-    }
+          .audio-message__menu-button {
+            top: 50%;
+            left: -40px;
+          }
 
-    .audio-message__context-menu {
-      top: 80%;
-      right: 100%;
-    }
-  }
+          .audio-message__context-menu {
+            top: 80%;
+            right: 100%;
+          }
+        }
 
-}
-
-.dark {
-  .audio-message {
-    &__left {
-
-      .audio-message__content {
-        background-color: var(--d-audio-message-background-left);
       }
 
-      .audio-message__play,
-      .audio-message__pause {
-        background-color: var(--d-audio-message-button-background-color-left);
+      .dark {
+        .audio-message {
+          &__left {
 
-        span {
-          color: var(--d-audio-message-button-icon-color-left);
+            .audio-message__content {
+              background-color: var(--d-audio-message-background-left);
+            }
+
+            .audio-message__play,
+            .audio-message__pause {
+              background-color: var(--d-audio-message-button-background-color-left);
+
+              span {
+                color: var(--d-audio-message-button-icon-color-left);
+              }
+            }
+          }
+
+          &__right {
+
+            .audio-message__content {
+              background-color: var(--d-audio-message-background-right);
+            }
+
+            .audio-message__play,
+            .audio-message__pause {
+              background-color: var(--d-audio-message-button-background-color-right);
+
+              span {
+                color: var(--d-audio-message-button-icon-color-right);
+              }
+            }
+          }
+
+          &__progress-bar-container {
+            background-color: var(--d-audio-message-pbc-background-color);
+          }
+
+          &__progress-bar {
+            background-color: var(--d-audio-message-pb-background-color);
+          }
+
+          &__status--received {
+            span {
+              color: var(--neutral-200);
+            }
+          }
+
+          &__menu-button {
+            &:hover span {
+              color: var(--neutral-200);
+            }
+          }
+
         }
       }
-    }
 
-    &__right {
-
-      .audio-message__content {
-        background-color: var(--d-audio-message-background-right);
+      .v-enter-active {
+        transition: all 0.1s ease-out;
       }
 
-      .audio-message__play,
-      .audio-message__pause {
-        background-color: var(--d-audio-message-button-background-color-right);
-
-        span {
-          color: var(--d-audio-message-button-icon-color-right);
-        }
+      .v-leave-active {
+        transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
       }
-    }
 
-    &__progress-bar-container {
-      background-color: var(--d-audio-message-pbc-background-color);
-    }
-
-    &__progress-bar {
-      background-color: var(--d-audio-message-pb-background-color);
-    }
-
-    &__status--received {
-      span {
-        color: var(--neutral-200);
+      .v-enter-from,
+      .v-leave-to {
+        transform: scale(0.9);
+        opacity: 0;
       }
-    }
-
-    &__menu-button {
-      &:hover span {
-        color: var(--neutral-200);
-      }
-    }
-
-  }
-}
-
-.v-enter-active {
-  transition: all 0.1s ease-out;
-}
-
-.v-leave-active {
-  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.v-enter-from,
-.v-leave-to {
-  transform: scale(0.9);
-  opacity: 0;
-}
-</style>
+    </style>
